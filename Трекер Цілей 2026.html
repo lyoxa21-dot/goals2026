@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Трекер Цілей 2026</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            
+            --color-bg: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        body {
+            padding: var(--space-16);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: var(--space-24);
+        }
+
+        .header h1 {
+            margin: 0 0 var(--space-8) 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 0;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-12);
+            margin-bottom: var(--space-16);
+            flex-wrap: wrap;
+        }
+
+        .date-picker {
+            margin-bottom: var(--space-24);
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+            flex-wrap: wrap;
+        }
+
+        .date-picker label {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .date-picker input {
+            padding: var(--space-8) var(--space-12);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: var(--space-8) var(--space-16);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+
+        .btn--primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn--primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn--secondary {
+            background: var(--color-gray-200);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn--secondary:hover {
+            background: var(--color-white);
+        }
+
+        .btn--small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-24);
+        }
+
+        .stat {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            text-align: center;
+        }
+
+        .stat__value {
+            margin: 0 0 var(--space-4) 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat__label {
+            margin: 0;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--color-gray-200);
+            border-radius: 2px;
+            margin-top: var(--space-8);
+            overflow: hidden;
+        }
+
+        .progress-bar__fill {
+            height: 100%;
+            background: var(--color-primary);
+            transition: width 300ms ease;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-20);
+            margin-bottom: var(--space-24);
+        }
+
+        .category {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category__header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-12);
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-12);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .category__emoji {
+            font-size: 24px;
+        }
+
+        .category__title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .category__progress {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+        }
+
+        .goals {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-12);
+        }
+
+        .goal {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: var(--space-12);
+            background: var(--color-bg);
+            border-radius: var(--radius-base);
+            border: 1px solid transparent;
+            transition: all 150ms ease;
+        }
+
+        .goal:hover {
+            background: var(--color-white);
+            border-color: var(--color-border);
+        }
+
+        .goal.completed .goal__text {
+            text-decoration: line-through;
+            color: var(--color-text-secondary);
+        }
+
+        .goal__top {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-12);
+        }
+
+        .goal__checkbox {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .goal__content {
+            flex: 1;
+        }
+
+        .goal__text {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .goal__meta {
+            margin: 0;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .goal__actions {
+            flex-shrink: 0;
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .goal__btn {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            padding: var(--space-4) var(--space-8);
+            border-radius: 4px;
+            transition: all 150ms ease;
+        }
+
+        .goal__btn:hover {
+            background: var(--color-gray-200);
+            color: var(--color-text);
+        }
+
+        .goal__daily {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .goal__daily label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .goal__daily input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .goal__daily input[type="number"] {
+            width: 80px;
+            padding: 4px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--color-border);
+        }
+
+        .goal__daily-stats {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal__content {
+            background: var(--color-surface);
+            border-radius: var(--radius-base);
+            padding: var(--space-24);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal__title {
+            margin: 0 0 var(--space-16) 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-16);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal__buttons {
+            display: flex;
+            gap: var(--space-12);
+            justify-content: flex-end;
+            margin-top: var(--space-20);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-12);
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .date-picker {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-picker input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Цілі 2026</h1>
+            <p>Трекер особистих цілей та прогресу</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn--primary" onclick="openAddGoalModal()">+ Додати ціль</button>
+            <button class="btn btn--secondary" onclick="exportToJSON()">📥 Експорт</button>
+            <button class="btn btn--secondary" onclick="resetCompleted()">🔄 Очистити все</button>
+        </div>
+
+        <div class="date-picker">
+            <label for="currentDate">Дата для щоденного трекінгу:</label>
+            <input type="date" id="currentDate" onchange="onDateChange()">
+            <button class="btn btn--secondary btn--small" onclick="setToday()">Сьогодні</button>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="categories" id="categories"></div>
+    </div>
+
+    <div class="modal" id="addGoalModal">
+        <div class="modal__content">
+            <h2 class="modal__title">Додати нову ціль</h2>
+            <div class="form-group">
+                <label class="form-label">Категорія</label>
+                <select class="form-select" id="newGoalCategory">
+                    <option value="spiritual">🙏 Духовні цілі</option>
+                    <option value="work">⛺ Робочі / служіннєві цілі</option>
+                    <option value="family">👨‍👩‍👧‍👦 Сімейні цілі</option>
+                    <option value="physical">💪 Фізичні цілі</option>
+                    <option value="financial">💵 Фінансові цілі</option>
+                    <option value="dreams">🌱 Мрії та «хотілки»</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Опис цілі</label>
+                <textarea class="form-textarea" id="newGoalText" placeholder="Напишіть вашу ціль..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Тип (опціонально)</label>
+                <input class="form-input" id="newGoalType" placeholder="Наприклад: щодня, щотижня, разовий">
+            </div>
+            <div class="modal__buttons">
+                <button class="btn btn--secondary" onclick="closeAddGoalModal()">Скасувати</button>
+                <button class="btn btn--primary" onclick="addGoal()">Додати</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GOALS_DATA = {
+            spiritual: [
+                { id: 1, text: "Біблія 365", type: "щодня", emoji: "📖" },
+                { id: 2, text: "Піст раз на тиждень + молитва", type: "щотижня", emoji: "⛪" },
+                { id: 3, text: "Молитва за сім'ю і дитину — 10 хв щодня", type: "щодня", emoji: "👨‍👩‍👧" },
+                { id: 4, text: "Восени вступити в одну з якісних семінарій", type: "разовий", emoji: "🎓" },
+                { id: 5, text: "Чистота", type: "365", emoji: "🤍" },
+                { id: 6, text: "Відсутність крику в сім'ї з мого боку", type: "365", emoji: "🕊️" }
+            ],
+            work: [
+                { id: 7, text: "Залученість у збори на табори: 3 млн", type: "разовий", emoji: "💰" },
+                { id: 8, text: "Соня Почабська + служіння у Вінниці: +1 людина, +1 підліток", type: "разовий", emoji: "🌱" },
+                { id: 9, text: "Зібрати $500 на весняну конференцію", type: "разовий", emoji: "🎤" },
+                { id: 10, text: "Пошук можливостей: Рівне, Луцьк", type: "розповсюджування", emoji: "🧭" },
+                { id: 11, text: "Розробити гайд щодо тренувань підлітків з інвалідністю", type: "разовий", emoji: "📘" },
+                { id: 12, text: "Кошти для оренди зали", type: "разовий", emoji: "🏋️" },
+                { id: 13, text: "3 літні табори — будь-яка роль", type: "разовий", emoji: "🏕️" },
+                { id: 14, text: "Довести уроки з Тимуром до кінця", type: "разовий", emoji: "📚" },
+                { id: 15, text: "Дати можливість одній сім'ї для розвитку", type: "разовий", emoji: "🤝" }
+            ],
+            family: [
+                { id: 16, text: "Відпустка — Словаччина", type: "разовий", emoji: "✈️" },
+                { id: 17, text: "Сімейні посиденьки — 1 раз на тиждень", type: "щотижня", emoji: "☕" },
+                { id: 18, text: "Зуби Діани — завершити повний цикл до кінця року", type: "до кінця року", emoji: "😁" },
+                { id: 19, text: "Переїзд в орендоване житло", type: "разовий", emoji: "🏠" },
+                { id: 20, text: "Побачення — не рідше 1 разу на місяць", type: "щомісячно", emoji: "❤️" },
+                { id: 21, text: "Спільне читання і молитва", type: "за потреби", emoji: "📖" },
+                { id: 22, text: "Спільний медогляд щодо питання дітей", type: "разовий", emoji: "🧬" }
+            ],
+            physical: [
+                { id: 23, text: "36 500 віджимань за рік", type: "щодня", emoji: "🔥", numericTarget: 36500 },
+                { id: 24, text: "104 повноцінні тренування (5 вправ, 1 година)", type: "тижневий графік", emoji: "🏋️", numericTarget: 104 },
+                { id: 25, text: "–5 см обхвату живота (контроль 31.11.26)", type: "до кінця року", emoji: "📏" }
+            ],
+            financial: [
+                { id: 26, text: "Відкласти $600 як інвестиції", type: "разовий", emoji: "💳", numericTarget: 600 },
+                { id: 27, text: "+1 джерело доходу (з думкою про пенсію)", type: "разовий", emoji: "➕" }
+            ],
+            dreams: [
+                { id: 28, text: "Випустити збірку віршів (16 шт.) та продавати на Amazon", type: "разовий", emoji: "📚" },
+                { id: 29, text: "З Тимуром взяти участь у змаганнях як тренер", type: "разовий", emoji: "🏆" },
+                { id: 30, text: "Здати на права восени", type: "восени", emoji: "🚗" },
+                { id: 31, text: "Поновити англійську (B1–B2)", type: "протягом року", emoji: "🇬🇧" }
+            ]
+        };
+
+        const CATEGORIES = {
+            spiritual: { name: "🙏 Духовні цілі", emoji: "🙏" },
+            work: { name: "⛺ Робочі / служіннєві цілі", emoji: "⛺" },
+            family: { name: "👨‍👩‍👧‍👦 Сімейні цілі", emoji: "👨‍👩‍👧‍👦" },
+            physical: { name: "💪 Фізичні цілі", emoji: "💪" },
+            financial: { name: "💵 Фінансові цілі", emoji: "💵" },
+            dreams: { name: "🌱 Мрії та «хотілки»", emoji: "🌱" }
+        };
+
+        let completedGoals = JSON.parse(localStorage.getItem('completedGoals') || '{}');
+        // per day: dailyProgress[goalId][date] = true/false
+        let dailyProgress = JSON.parse(localStorage.getItem('dailyProgress') || '{}');
+        // per day numeric: dailyNumeric[goalId][date] = number
+        let dailyNumeric = JSON.parse(localStorage.getItem('dailyNumeric') || '{}');
+        // total numeric per goal
+        let numericProgress = JSON.parse(localStorage.getItem('numericProgress') || '{}');
+        let currentDate = null;
+
+        function getAllGoals() {
+            return Object.values(GOALS_DATA).flat();
+        }
+
+        function setToday() {
+            const today = new Date();
+            const input = document.getElementById('currentDate');
+            const iso = today.toISOString().split('T')[0];
+            input.value = iso;
+            currentDate = iso;
+            renderCategories();
+        }
+
+        function onDateChange() {
+            const input = document.getElementById('currentDate');
+            currentDate = input.value;
+            if (!currentDate) return;
+            renderCategories();
+        }
+
+        function getYearFromDate(dateStr) {
+            if (!dateStr) return new Date().getFullYear();
+            return parseInt(dateStr.split('-')[0], 10);
+        }
+
+        function getYearDays(dateStr) {
+            const year = getYearFromDate(dateStr);
+            const start = new Date(year, 0, 1);
+            const end = new Date(year + 1, 0, 1);
+            return Math.round((end - start) / (1000 * 60 * 60 * 24));
+        }
+
+        function init() {
+            const input = document.getElementById('currentDate');
+            if (!input.value) {
+                const today = new Date();
+                const iso = today.toISOString().split('T')[0];
+                input.value = iso;
+                currentDate = iso;
+            } else {
+                currentDate = input.value;
+            }
+            renderCategories();
+            updateStats();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            container.innerHTML = '';
+
+            Object.entries(GOALS_DATA).forEach(([categoryKey, goals]) => {
+                const categoryName = CATEGORIES[categoryKey].name;
+                const completedCount = goals.filter(g => completedGoals[g.id]).length;
+
+                const categoryEl = document.createElement('div');
+                categoryEl.className = 'category';
+
+                const headerEl = document.createElement('div');
+                headerEl.className = 'category__header';
+                headerEl.innerHTML = `
+                    <div class="category__emoji">${CATEGORIES[categoryKey].emoji}</div>
+                    <h2 class="category__title">${categoryName}</h2>
+                    <div class="category__progress">${completedCount}/${goals.length}</div>
+                `;
+                categoryEl.appendChild(headerEl);
+
+                const goalsEl = document.createElement('div');
+                goalsEl.className = 'goals';
+
+                goals.forEach(goal => {
+                    const isCompleted = completedGoals[goal.id];
+                    const goalEl = document.createElement('div');
+                    goalEl.className = `goal ${isCompleted ? 'completed' : ''}`;
+
+                    const dailyKey = String(goal.id);
+                    const dayKey = currentDate || '';
+
+                    const doneToday = (dailyProgress[dailyKey] && dailyProgress[dailyKey][dayKey]) || false;
+                    const dayNumeric = (dailyNumeric[dailyKey] && dailyNumeric[dailyKey][dayKey]) || 0;
+
+                    const goalDates = dailyProgress[dailyKey] || {};
+                    const yearDays = getYearDays(currentDate);
+                    const dailyCount = Object.values(goalDates).filter(Boolean).length;
+                    const dailyPercentage = Math.round((dailyCount / yearDays) * 100) || 0;
+
+                    const totalNumeric = numericProgress[dailyKey] || 0;
+
+                    const topRow = document.createElement('div');
+                    topRow.className = 'goal__top';
+                    topRow.innerHTML = `
+                        <input type="checkbox" class="goal__checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleGoal(${goal.id})">
+                        <div class="goal__content">
+                            <p class="goal__text">${goal.emoji} ${goal.text}</p>
+                            <p class="goal__meta">${goal.type}</p>
+                        </div>
+                        <div class="goal__actions">
+                            <button class="goal__btn" onclick="deleteGoal(${goal.id})">✕</button>
+                        </div>
+                    `;
+                    goalEl.appendChild(topRow);
+
+                    const dailyRow = document.createElement('div');
+                    dailyRow.className = 'goal__daily';
+
+                    const targetText = goal.numericTarget ? ` / ${goal.numericTarget}` : '';
+
+                    const statsText = `Днів відмічено: ${dailyCount} (${dailyPercentage}%)`;
+
+                    dailyRow.innerHTML = `
+                        <label>
+                            <input type="checkbox" ${doneToday ? 'checked' : ''}
+                                onchange="toggleDaily(${goal.id}, '${currentDate}')">
+                            сьогодні виконано
+                        </label>
+                        <label>
+                            кількість сьогодні:
+                            <input type="number" min="0" step="1"
+                                value="${dayNumeric}"
+                                onchange="setDailyNumeric(${goal.id}, '${currentDate}', this.value)">
+                        </label>
+                        <span style="font-size:10px;color:#888;">
+                            всього за рік: ${totalNumeric}${targetText}
+                        </span>
+                        <span class="goal__daily-stats">${statsText}</span>
+                    `;
+
+                    goalEl.appendChild(dailyRow);
+                    goalsEl.appendChild(goalEl);
+                });
+
+                categoryEl.appendChild(goalsEl);
+                container.appendChild(categoryEl);
+            });
+        }
+
+        function updateStats() {
+            const allGoals = getAllGoals();
+            const completed = allGoals.filter(g => completedGoals[g.id]).length;
+            const total = allGoals.length;
+            const percentage = Math.round((completed / total) * 100) || 0;
+
+            const statsEl = document.getElementById('stats');
+            statsEl.innerHTML = `
+                <div class="stat">
+                    <p class="stat__value">${percentage}%</p>
+                    <p class="stat__label">Загальний прогрес по цілях</p>
+                    <div class="progress-bar">
+                        <div class="progress-bar__fill" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <p class="stat__value">${completed}</p>
+                    <p class="stat__label">Завершено цілей</p>
+                </div>
+                <div class="stat">
+                    <p class="stat__value">${total - completed}</p>
+                    <p class="stat__label">Залишилось</p>
+                </div>
+                <div class="stat">
+                    <p class="stat__value">${total}</p>
+                    <p class="stat__label">Всього цілей</p>
+                </div>
+            `;
+        }
+
+        function toggleGoal(id) {
+            if (completedGoals[id]) {
+                delete completedGoals[id];
+            } else {
+                completedGoals[id] = true;
+            }
+            localStorage.setItem('completedGoals', JSON.stringify(completedGoals));
+            renderCategories();
+            updateStats();
+        }
+
+        function toggleDaily(id, dateStr) {
+            if (!dateStr) return;
+            const goalKey = String(id);
+            if (!dailyProgress[goalKey]) dailyProgress[goalKey] = {};
+            dailyProgress[goalKey][dateStr] = !dailyProgress[goalKey][dateStr];
+            localStorage.setItem('dailyProgress', JSON.stringify(dailyProgress));
+            renderCategories();
+        }
+
+        function setDailyNumeric(id, dateStr, value) {
+            const num = Number(value);
+            const goalKey = String(id);
+            if (!dailyNumeric[goalKey]) dailyNumeric[goalKey] = {};
+
+            if (isNaN(num) || num <= 0) {
+                delete dailyNumeric[goalKey][dateStr];
+            } else {
+                dailyNumeric[goalKey][dateStr] = num;
+            }
+
+            const allDays = dailyNumeric[goalKey] || {};
+            const total = Object.values(allDays).reduce((sum, v) => sum + (Number(v) || 0), 0);
+            numericProgress[goalKey] = total;
+
+            localStorage.setItem('dailyNumeric', JSON.stringify(dailyNumeric));
+            localStorage.setItem('numericProgress', JSON.stringify(numericProgress));
+            renderCategories();
+        }
+
+        function deleteGoal(id) {
+            Object.entries(GOALS_DATA).forEach(([categoryKey, goals]) => {
+                const index = goals.findIndex(g => g.id === id);
+                if (index !== -1) {
+                    goals.splice(index, 1);
+                }
+            });
+            delete completedGoals[id];
+            delete dailyProgress[String(id)];
+            delete dailyNumeric[String(id)];
+            delete numericProgress[String(id)];
+            localStorage.setItem('completedGoals', JSON.stringify(completedGoals));
+            localStorage.setItem('dailyProgress', JSON.stringify(dailyProgress));
+            localStorage.setItem('dailyNumeric', JSON.stringify(dailyNumeric));
+            localStorage.setItem('numericProgress', JSON.stringify(numericProgress));
+            renderCategories();
+            updateStats();
+        }
+
+        function openAddGoalModal() {
+            document.getElementById('addGoalModal').classList.add('active');
+        }
+
+        function closeAddGoalModal() {
+            document.getElementById('addGoalModal').classList.remove('active');
+            document.getElementById('newGoalText').value = '';
+            document.getElementById('newGoalType').value = '';
+        }
+
+        function addGoal() {
+            const category = document.getElementById('newGoalCategory').value;
+            const text = document.getElementById('newGoalText').value;
+            const type = document.getElementById('newGoalType').value || 'разовий';
+
+            if (!text.trim()) {
+                alert('Будь ласка, напишіть ціль');
+                return;
+            }
+
+            const newId = Math.max(...getAllGoals().map(g => g.id), 0) + 1;
+            const newGoal = { id: newId, text: text.trim(), type: type, emoji: '✓' };
+
+            GOALS_DATA[category].push(newGoal);
+
+            closeAddGoalModal();
+            renderCategories();
+            updateStats();
+        }
+
+        function exportToJSON() {
+            const data = {
+                date: new Date().toLocaleDateString('uk-UA'),
+                goals: GOALS_DATA,
+                completedGoals,
+                dailyProgress,
+                dailyNumeric,
+                numericProgress,
+                stats: {
+                    total: getAllGoals().length,
+                    completed: Object.keys(completedGoals).length
+                }
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `цілі-2026-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetCompleted() {
+            if (confirm('Ви впевнені? Це очистить усі галочки, щоденні відмітки та числа.')) {
+                completedGoals = {};
+                dailyProgress = {};
+                dailyNumeric = {};
+                numericProgress = {};
+                localStorage.setItem('completedGoals', JSON.stringify(completedGoals));
+                localStorage.setItem('dailyProgress', JSON.stringify(dailyProgress));
+                localStorage.setItem('dailyNumeric', JSON.stringify(dailyNumeric));
+                localStorage.setItem('numericProgress', JSON.stringify(numericProgress));
+                renderCategories();
+                updateStats();
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
+
